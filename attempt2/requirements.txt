@@ -1,0 +1,15 @@
+Minesweeper
+
+Grid of indeterminate size
+Percentage of Grid is Bombs
+Player Chooses a square hoping it does not have a bomb
+
+Upon the selection of a square three things may happen:
+Its a bomb, and the player loses
+Its not a bomb, but it is surrounded by one or more bombs so you relay to the user how many bombs are around it
+Its not a bomb and no bombs exist around it. Proceed to look at each of the unexplored squares and uncover it as
+if it were selected by a player (None will have bombs by virtue of this case being reached)
+
+Objects to work with:
+Grid to store each node
+Nodes to store information like if it has a bomb or not
