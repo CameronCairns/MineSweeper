@@ -10,28 +10,38 @@ class Grid:
         self.grid = [[ Node(row, column) for column in range(dimension)] for row in range(dimension)]
 
     def test(self, row, column):
-        pdb.set_trace()
         if self.grid[row][column].bomb == True:
             # tested a bomb so they lost
             return 'lost'
         else:
             # test if any bombs surround it
-            self.grid[row][column].revealed == True
+            self.grid[row][column].revealed = True
             self.discover(row, column)
+            return self.check_win()
 
     def discover(self, row, column):
         surrounding_bombs = 0
-        for row, value in enumerate(self.grid[row-1:row+2]):
-            for column, value in enumerate(self.grid[row-1:row+2]):
-                if self.grid[row][column].revealed == False and self.grid[row][column].bomb == True:
+        for r1 in range(row-1, row+2):
+            for c1 in range(column-1, column+2):
+                if(0 <= r1 < self.dimension and 0 <= c1 < self.dimension and
+                   self.grid[r1][c1].revealed == False and self.grid[r1][c1].bomb == True):
                     surrounding_bombs += 1
-        self.grid[row][column].surrounding_bombs == surrounding_bombs
-        self.grid[row][column].revealed == True
+        self.grid[row][column].surrounding_bombs = surrounding_bombs
         if surrounding_bombs == 0:
             # No bombs found
-            for row, value in enumerate(self.grid[row-1:row+2]):
-                for column, value in enumerate(self.grid[row-1:row+2]):
-                    discover(row, column)
+            for r1 in range(row-1, row+2):
+                for c1 in range(column-1, column+2):
+                    if(0 <= r1 < self.dimension and 0 <= c1 < self.dimension and
+                       self.grid[r1][c1].revealed == False):
+                        self.grid[r1][c1].revealed = True
+                        self.discover(r1, c1)
+
+    def check_win(self):
+        for row in self.grid:
+            for node in row:
+                if node.bomb == False and node.revealed == False:
+                    return 'not finished'
+        return 'won'
 
 
     def print(self):
@@ -43,7 +53,7 @@ class Grid:
 
     def generate_bombs(self):
         random.seed()
-        number_of_bombs = self.percent_bombs*.01*self.dimension**2
+        number_of_bombs = int(self.percent_bombs*.01*self.dimension**2)
         while number_of_bombs > 0:
             row = random.randrange(self.dimension)
             column = random.randrange(self.dimension)
@@ -57,7 +67,7 @@ class Node:
         self.row = row
         self.column = column
         self.bomb = False
-        self.surrounding_bombs = 0
+        self.surrounding_bombs = None
         self.revealed = False
 
     def __str__(self):
@@ -92,14 +102,14 @@ if __name__ == '__main__':
     while not game_over:
         grid.print()
         row, column = (int(x) for x in input().split())
-        if(row < grid.dimension and row > 0 and
-           column < grid.dimension and column > 0):
+        if(row < grid.dimension and row >= 0 and
+           column < grid.dimension and column >= 0):
             # Test the entered row, and column are valid for dimensions
             result = grid.test(row, column)
             if result == 'lost':
                 print('You Lost! Please try again')
                 game_over = True
-            elif result == 'win':
+            elif result == 'won':
                 print('You Won!')
                 game_over = True
             else:
